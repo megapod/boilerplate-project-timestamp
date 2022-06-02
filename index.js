@@ -24,6 +24,45 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.get("/api/:date?", function (req, res, next) {
+  // let dateString = req.params.date
+  // console.log(req.params.date)
+    // internal var for tests on time recived
+  let timeRecived = req.params.date
+  
+  if (req.params.date == undefined) {
+    // console.log('yes')
+    const time =  new Date()
+    const utcTime = time.toUTCString()
+    const unixTime = Date.parse(utcTime)
+    // console.log({unix: unixTime, utc: utcTime})
+    res.json({unix: unixTime, utc: utcTime})   
+    next()
+  }
+  
+  // check if we got a string or a 13 digits number string
+  else if (req.params.date.length == 13) {
+    timeRecived = +req.params.date
+  }
+  
+  // time string to time object
+  const timeRecivedAsTimeObject = new Date(timeRecived)
+  
+  // if not a valid date return { error : "Invalid Date" }
+  if (new Date(timeRecived).toString() === "Invalid Date") {
+    res.json({ error : "Invalid Date" });
+  } else {
+    // get utc time
+    const utcTime = timeRecivedAsTimeObject.toUTCString()
+    
+    // get unix time stamps format
+    const unixTime = Date.parse(timeRecivedAsTimeObject)
+  
+    // return output
+    res.json({"unix": unixTime, "utc": utcTime})
+  }
+});
+
 
 
 // listen for requests :)
